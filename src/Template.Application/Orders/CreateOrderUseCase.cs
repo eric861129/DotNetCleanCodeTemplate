@@ -5,6 +5,7 @@ using Template.Domain.Orders;
 namespace Template.Application.Orders;
 
 public sealed class CreateOrderUseCase(
+    IValidator<CreateOrderRequest> validator,
     IOrderRepository orderRepository,
     IOutboxMessageRepository outboxMessageRepository,
     IUnitOfWork unitOfWork,
@@ -12,6 +13,12 @@ public sealed class CreateOrderUseCase(
 {
     public async Task<Result<OrderResponse>> HandleAsync(CreateOrderRequest request, CancellationToken cancellationToken)
     {
+        var validationResult = validator.Validate(request);
+        if (!validationResult.IsValid)
+        {
+            return Result<OrderResponse>.Failure(Error.Validation(validationResult.Errors));
+        }
+
         try
         {
             var now = timeProvider.GetUtcNow();
@@ -30,7 +37,7 @@ public sealed class CreateOrderUseCase(
         }
         catch (Template.Domain.Common.DomainException exception)
         {
-            return Result<OrderResponse>.Failure(exception.Message);
+            return Result<OrderResponse>.Failure(Error.Domain("Orders.InvalidState", exception.Message));
         }
     }
 

@@ -17,4 +17,22 @@ public sealed class OrderRepository(AppDbContext dbContext) : IOrderRepository
             .Include(order => order.Items)
             .FirstOrDefaultAsync(order => order.Id == id, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Order>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken)
+    {
+        var orders = await dbContext.Orders
+            .Include(order => order.Items)
+            .ToListAsync(cancellationToken);
+
+        return orders
+            .OrderByDescending(order => order.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public Task<int> CountAsync(CancellationToken cancellationToken)
+    {
+        return dbContext.Orders.CountAsync(cancellationToken);
+    }
 }

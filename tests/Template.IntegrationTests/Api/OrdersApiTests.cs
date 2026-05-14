@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Template.Application.Orders;
+using Template.Application.Common;
 using Template.Infrastructure.Persistence;
 
 namespace Template.IntegrationTests.Api;
@@ -57,6 +58,53 @@ public sealed class OrdersApiTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var order = await response.Content.ReadFromJsonAsync<OrderResponse>();
         Assert.Equal(created.Id, order!.Id);
+    }
+
+    [Fact]
+    public async Task GetOrdersReturnsPagedOrders()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
+
+        await client.PostAsJsonAsync(
+            "/api/orders",
+            new CreateOrderRequest("customer-001", [new CreateOrderItemRequest("Clean Code", 1, 30m)]));
+        await client.PostAsJsonAsync(
+            "/api/orders",
+            new CreateOrderRequest("customer-002", [new CreateOrderItemRequest("Refactoring", 1, 45m)]));
+
+        var response = await client.GetAsync("/api/orders?page=1&pageSize=1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var page = await response.Content.ReadFromJsonAsync<PagedResult<OrderResponse>>();
+        Assert.NotNull(page);
+        Assert.Equal(2, page.TotalCount);
+        Assert.Equal(1, page.Page);
+        Assert.Single(page.Items);
+    }
+
+    [Fact]
+    public async Task PostOrderValidationFailureReturnsValidationProblem()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
+
+        var response = await client.PostAsJsonAsync("/api/orders", new CreateOrderRequest("", []));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task GetMissingOrderReturnsProblemDetails()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
+
+        var response = await client.GetAsync($"/api/orders/{Guid.NewGuid()}");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
     }
 
     [Fact]

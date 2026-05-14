@@ -1,5 +1,6 @@
 using Template.Application.Common;
 using Template.Application.Orders;
+using Template.WebApi.Http;
 
 namespace Template.WebApi.Endpoints;
 
@@ -11,6 +12,20 @@ public static class OrderEndpoints
             .WithTags("Orders")
             .RequireAuthorization();
 
+        group.MapGet("/", async (
+            int page,
+            int pageSize,
+            IUseCase<GetOrdersRequest, Result<PagedResult<OrderResponse>>> useCase,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await useCase.HandleAsync(new GetOrdersRequest(page, pageSize), cancellationToken);
+
+            return result.ToHttpResult(Results.Ok);
+        })
+        .WithName("GetOrders")
+        .Produces<PagedResult<OrderResponse>>()
+        .ProducesProblem(StatusCodes.Status401Unauthorized);
+
         group.MapPost("/", async (
             CreateOrderRequest request,
             IUseCase<CreateOrderRequest, Result<OrderResponse>> useCase,
@@ -18,9 +33,7 @@ public static class OrderEndpoints
         {
             var result = await useCase.HandleAsync(request, cancellationToken);
 
-            return result.IsSuccess
-                ? Results.Created($"/api/orders/{result.Value.Id}", result.Value)
-                : Results.BadRequest(new { message = result.Error });
+            return result.ToHttpResult(order => Results.Created($"/api/orders/{order.Id}", order));
         })
         .WithName("CreateOrder")
         .Produces<OrderResponse>(StatusCodes.Status201Created)
@@ -34,9 +47,7 @@ public static class OrderEndpoints
         {
             var result = await useCase.HandleAsync(new GetOrderByIdRequest(id), cancellationToken);
 
-            return result.IsSuccess
-                ? Results.Ok(result.Value)
-                : Results.NotFound(new { message = result.Error });
+            return result.ToHttpResult(Results.Ok);
         })
         .WithName("GetOrderById")
         .Produces<OrderResponse>()

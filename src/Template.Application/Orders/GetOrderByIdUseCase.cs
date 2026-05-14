@@ -12,7 +12,7 @@ public sealed class GetOrderByIdUseCase(IOrderRepository orderRepository)
         var order = await orderRepository.GetByIdAsync(request.Id, cancellationToken);
 
         return order is null
-            ? Result<OrderResponse>.Failure("Order was not found.")
+            ? Result<OrderResponse>.Failure(Error.NotFound("Orders.NotFound", "Order was not found."))
             : Result<OrderResponse>.Success(order.ToResponse());
     }
 }

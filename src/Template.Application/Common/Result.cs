@@ -5,11 +5,11 @@ public sealed class Result<T>
     private Result(T value)
     {
         Value = value;
-        Error = string.Empty;
+        Error = Error.None;
         IsSuccess = true;
     }
 
-    private Result(string error)
+    private Result(Error error)
     {
         Value = default!;
         Error = error;
@@ -22,9 +22,9 @@ public sealed class Result<T>
 
     public T Value { get; }
 
-    public string Error { get; }
+    public Error Error { get; }
 
     public static Result<T> Success(T value) => new(value);
 
-    public static Result<T> Failure(string error) => new(error);
+    public static Result<T> Failure(Error error) => new(error);
 }
