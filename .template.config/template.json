@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "CleanCodeTemplate",
+  "classifications": ["Web", "Worker", "Clean Architecture", "API"],
+  "identity": "CleanCodeTemplate.ApiWorker",
+  "name": "Clean Code API + Worker",
+  "shortName": "clean-code-api-worker",
+  "sourceName": "Template",
+  "preferNameDirectory": true,
+  "description": "Pragmatic Clean Architecture template for .NET 10 LTS Web API and Worker services.",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+    "Framework": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "net10.0",
+          "description": ".NET 10 LTS"
+        }
+      ],
+      "defaultValue": "net10.0",
+      "replaces": "net10.0"
+    }
+  },
+  "sources": [
+    {
+      "exclude": [
+        ".git/**",
+        ".vs/**",
+        ".vscode/**",
+        "**/bin/**",
+        "**/obj/**",
+        ".template-output/**"
+      ]
+    }
+  ]
+}

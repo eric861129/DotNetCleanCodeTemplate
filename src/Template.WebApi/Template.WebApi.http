@@ -1,0 +1,21 @@
+@Template.WebApi_HostAddress = http://localhost:5007
+
+GET {{Template.WebApi_HostAddress}}/health
+Accept: application/json
+
+###
+
+POST {{Template.WebApi_HostAddress}}/api/orders
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "customerId": "customer-001",
+  "items": [
+    {
+      "productName": "Clean Code",
+      "quantity": 2,
+      "unitPrice": 30
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Template.Application.Common;
+
+namespace Template.Infrastructure.Persistence.Configurations;
+
+public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessage>
+{
+    public void Configure(EntityTypeBuilder<OutboxMessage> builder)
+    {
+        builder.ToTable("OutboxMessages");
+        builder.HasKey(message => message.Id);
+
+        builder.Property(message => message.Type)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(message => message.Payload).IsRequired();
+        builder.Property(message => message.OccurredAt).IsRequired();
+        builder.Property(message => message.ProcessedAt);
+        builder.Property(message => message.RetryCount).IsRequired();
+        builder.Property(message => message.Error).HasMaxLength(2000);
+
+        builder.HasIndex(message => new { message.ProcessedAt, message.OccurredAt });
+    }
+}
