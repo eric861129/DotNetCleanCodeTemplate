@@ -15,6 +15,19 @@
 
 若產生範本時使用 `--auth none`，Orders endpoint 不會套用 JWT middleware。
 
+## Cross-Cutting Headers
+
+所有 API response 都會帶有：
+
+| Header | 用途 |
+| --- | --- |
+| `X-Correlation-Id` | 追蹤單次 request。若 request 已帶入此 header，response 會沿用同一個值。 |
+| `X-Content-Type-Options: nosniff` | 降低瀏覽器 content sniffing 風險。 |
+| `X-Frame-Options: DENY` | 避免 API 被 frame 嵌入。 |
+| `Referrer-Policy: no-referrer` | 避免 referrer 洩漏。 |
+
+當超過 rate limit 時會回傳 `429 Too Many Requests`。
+
 ## 分頁查詢訂單
 
 Request：
@@ -80,6 +93,7 @@ Request：
 - Domain validation 失敗時回傳 `400 ProblemDetails`。
 - 查無資料時回傳 `404 ProblemDetails`。
 - Bearer token 缺少或無效時回傳 `401 Unauthorized`。
+- 超過 rate limit 時回傳 `429 Too Many Requests`。
 
 ## Authentication
 

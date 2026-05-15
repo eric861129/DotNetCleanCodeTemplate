@@ -68,6 +68,26 @@ Production 建議：
 
 `Outbox` options 會在 Worker 啟動時驗證，避免部署後才發現 polling 設定無效。
 
+## RateLimiting
+
+```json
+{
+  "RateLimiting": {
+    "PermitLimit": 100,
+    "WindowSeconds": 60,
+    "QueueLimit": 0
+  }
+}
+```
+
+| 設定 | 用途 |
+| --- | --- |
+| `PermitLimit` | 每個 fixed window 允許的 request 數量。 |
+| `WindowSeconds` | fixed window 秒數。 |
+| `QueueLimit` | 超過限制時可排隊的 request 數量；預設 `0` 代表直接回 `429`。 |
+
+`RateLimiting` options 會在 API 啟動時驗證，`PermitLimit` 與 `WindowSeconds` 必須大於 `0`，`QueueLimit` 不可小於 `0`。
+
 ## Environment Variables
 
 巢狀設定使用雙底線：
@@ -76,4 +96,5 @@ Production 建議：
 $env:ConnectionStrings__DefaultConnection = "Server=..."
 $env:Jwt__SigningKey = "replace-with-secret"
 $env:Outbox__BatchSize = "50"
+$env:RateLimiting__PermitLimit = "200"
 ```

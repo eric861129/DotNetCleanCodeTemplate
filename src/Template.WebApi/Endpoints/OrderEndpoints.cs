@@ -9,7 +9,8 @@ public static class OrderEndpoints
     public static IEndpointRouteBuilder MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/orders")
-            .WithTags("Orders");
+            .WithTags("Orders")
+            .RequireRateLimiting("global");
 
         //#if (useJwt)
         group.RequireAuthorization();

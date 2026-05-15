@@ -65,7 +65,31 @@ GitHub Actions workflow：
 
 ## Logging
 
-API 與 Worker 使用標準 .NET logging。Worker dispatcher 範例會記錄 outbox message dispatch；正式環境應替換 `LoggingOutboxMessageDispatcher`，串接實際 message broker、HTTP callback 或其他外部系統。
+API 與 Worker 使用標準 .NET logging。API request log 會包含 HTTP method、path、status code、elapsed milliseconds 與 correlation id。Worker dispatcher 範例會記錄 outbox message dispatch；正式環境應替換 `LoggingOutboxMessageDispatcher`，串接實際 message broker、HTTP callback 或其他外部系統。
+
+## Correlation Id
+
+API 會接受並回傳 `X-Correlation-Id`：
+
+```powershell
+curl -H "X-Correlation-Id: local-debug-001" http://localhost:5000/health/live -i
+```
+
+如果 request 沒有提供，API 會自動產生一個新的 correlation id，並放入 response header 與 request logging scope。
+
+## Rate Limiting
+
+範本使用 ASP.NET Core 內建 fixed-window limiter。預設值適合本機開發，正式環境請依服務流量調整：
+
+```json
+{
+  "RateLimiting": {
+    "PermitLimit": 100,
+    "WindowSeconds": 60,
+    "QueueLimit": 0
+  }
+}
+```
 
 ## 上線前檢查
 
@@ -75,3 +99,5 @@ API 與 Worker 使用標準 .NET logging。Worker dispatcher 範例會記錄 out
 - 規劃 Worker 是獨立 process、container，或由平台排程啟動。
 - 將範例 dispatcher 替換成正式 message transport。
 - 依部署平台設定 `/health/live` 與 `/health/ready` probe。
+- 依 API 流量調整 `RateLimiting`。
+- 將 reverse proxy / gateway 的 request id 對應到 `X-Correlation-Id`。

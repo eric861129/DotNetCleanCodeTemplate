@@ -7,7 +7,7 @@
 - `Template.Domain`：訂單聚合、業務規則、domain exception。
 - `Template.Application`：use case contract、request/response record、repository 介面、unit of work、outbox contract。
 - `Template.Infrastructure`：EF Core persistence、SQL Server 預設設定、repository 實作、outbox 儲存、migration-ready DbContext。
-- `Template.WebApi`：Minimal API endpoint、Swagger、JWT Bearer 驗證、ProblemDetails、分級 health checks。
+- `Template.WebApi`：Minimal API endpoint、Swagger、JWT Bearer 驗證、ProblemDetails、分級 health checks、correlation id、security headers、rate limiting。
 - `Template.Worker`：可替換 dispatcher 的 Outbox 背景處理服務。
 - `tests`：Domain、Application、API、Worker 與 Outbox 行為測試。
 
@@ -89,6 +89,8 @@ dotnet new uninstall .
 - `GET /api/orders/{id}`
 
 訂單相關 endpoint 預設需要 JWT Bearer authentication。錯誤回應統一使用 `ProblemDetails` / `ValidationProblemDetails`。開發用 signing key 僅供本機使用，上線前必須更換。
+
+Web API 會在 response 加上 `X-Correlation-Id`，若 request 已帶入同名 header 會沿用該值。範本也預設加入基本 security headers 與 global fixed-window rate limiting。
 
 ## 資料庫
 
