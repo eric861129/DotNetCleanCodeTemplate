@@ -38,6 +38,7 @@ public static class WebApiServiceCollectionExtensions
         });
         services.AddProblemDetails();
         services.AddWebApiRateLimiting(configuration);
+        services.AddWebApiObservability(configuration);
         //#if (useJwt)
         services.AddJwtAuthentication(configuration);
         //#endif

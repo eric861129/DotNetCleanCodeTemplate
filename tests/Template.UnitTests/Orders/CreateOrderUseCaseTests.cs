@@ -126,6 +126,16 @@ public sealed class CreateOrderUseCaseTests
         {
             return Task.FromResult<IReadOnlyList<OutboxMessage>>(Messages.Where(message => message.ProcessedAt is null).ToList());
         }
+
+        public Task<long> CountPendingAsync(CancellationToken cancellationToken)
+        {
+            return Task.FromResult(Messages.LongCount(message => message.ProcessedAt is null));
+        }
+
+        public Task<long> CountFailedAsync(CancellationToken cancellationToken)
+        {
+            return Task.FromResult(Messages.LongCount(message => message.ProcessedAt is null && message.RetryCount > 0));
+        }
     }
 
     private sealed class InMemoryUnitOfWork : IUnitOfWork

@@ -21,4 +21,18 @@ public sealed class OutboxMessageRepository(AppDbContext dbContext) : IOutboxMes
             .Take(batchSize)
             .ToList();
     }
+
+    public Task<long> CountPendingAsync(CancellationToken cancellationToken)
+    {
+        return dbContext.OutboxMessages
+            .LongCountAsync(message => message.ProcessedAt == null, cancellationToken);
+    }
+
+    public Task<long> CountFailedAsync(CancellationToken cancellationToken)
+    {
+        return dbContext.OutboxMessages
+            .LongCountAsync(
+                message => message.ProcessedAt == null && message.RetryCount > 0,
+                cancellationToken);
+    }
 }

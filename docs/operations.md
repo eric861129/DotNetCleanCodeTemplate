@@ -67,6 +67,12 @@ GitHub Actions workflow：
 
 API 與 Worker 使用標準 .NET logging。API request log 會包含 HTTP method、path、status code、elapsed milliseconds 與 correlation id。Worker dispatcher 範例會記錄 outbox message dispatch；正式環境應替換 `LoggingOutboxMessageDispatcher`，串接實際 message broker、HTTP callback 或其他外部系統。
 
+## Observability
+
+WebApi 與 Worker 支援 OpenTelemetry tracing / metrics，並可透過 Console exporter 或 OTLP exporter 輸出。正式環境建議接 OpenTelemetry Collector，再由 Collector 輸出到團隊使用的平台。
+
+Outbox worker 會記錄 dispatch trace、成功 / 失敗 counter、duration histogram、pending count 與 failed count。詳細設定請看 [Observability](observability.md)。
+
 ## Correlation Id
 
 API 會接受並回傳 `X-Correlation-Id`：

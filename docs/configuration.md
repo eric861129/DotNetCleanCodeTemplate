@@ -88,6 +88,46 @@ Production 建議：
 
 `RateLimiting` options 會在 API 啟動時驗證，`PermitLimit` 與 `WindowSeconds` 必須大於 `0`，`QueueLimit` 不可小於 `0`。
 
+## Observability
+
+WebApi 與 Worker 都支援 OpenTelemetry 設定：
+
+```json
+{
+  "Observability": {
+    "Enabled": false,
+    "ServiceName": "CleanCodeTemplate.WebApi",
+    "ServiceVersion": "1.0.0",
+    "Tracing": {
+      "Enabled": true
+    },
+    "Metrics": {
+      "Enabled": true
+    },
+    "ConsoleExporter": {
+      "Enabled": false
+    },
+    "OtlpExporter": {
+      "Enabled": false,
+      "Endpoint": ""
+    }
+  }
+}
+```
+
+| 設定 | 用途 |
+| --- | --- |
+| `Enabled` | 是否啟用 OpenTelemetry pipeline。 |
+| `ServiceName` | service resource name；WebApi 與 Worker 建議不同。 |
+| `ServiceVersion` | release version 或 image tag。 |
+| `Tracing:Enabled` | 是否收集 traces。 |
+| `Metrics:Enabled` | 是否收集 metrics。 |
+| `ConsoleExporter:Enabled` | 是否輸出到 console，適合本機驗證。 |
+| `OtlpExporter:Enabled` | 是否使用 OTLP exporter。 |
+| `OtlpExporter:Endpoint` | OTLP endpoint，例如 `http://localhost:4317`。 |
+
+詳細說明請看 [Observability](observability.md)。
+
 ## Environment Variables
 
 巢狀設定使用雙底線：
@@ -97,4 +137,7 @@ $env:ConnectionStrings__DefaultConnection = "Server=..."
 $env:Jwt__SigningKey = "replace-with-secret"
 $env:Outbox__BatchSize = "50"
 $env:RateLimiting__PermitLimit = "200"
+$env:Observability__Enabled = "true"
+$env:Observability__OtlpExporter__Enabled = "true"
+$env:Observability__OtlpExporter__Endpoint = "http://localhost:4317"
 ```

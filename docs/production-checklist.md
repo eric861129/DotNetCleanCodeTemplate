@@ -145,6 +145,8 @@ docker build -f src/Template.Worker/Dockerfile -t sample-service-worker:local .
 | Metrics | 至少追蹤 request rate、latency、error rate、DB health、outbox pending count、dispatch failure count。 |
 | Alerting | 5xx、ready check failure、outbox retry 過高、DB connection failure 有告警。 |
 
+OpenTelemetry 設定請參考 [Observability](observability.md)。正式環境建議使用 OTLP exporter 串接 OpenTelemetry Collector，避免每個服務直接管理後端 credentials。
+
 Production log 不應包含：
 
 - JWT token 原文。

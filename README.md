@@ -7,8 +7,8 @@
 - `Template.Domain`：訂單聚合、業務規則、domain exception。
 - `Template.Application`：use case contract、request/response record、repository 介面、unit of work、outbox contract。
 - `Template.Infrastructure`：EF Core persistence、SQL Server 預設設定、repository 實作、outbox 儲存、migration-ready DbContext。
-- `Template.WebApi`：Minimal API endpoint、Swagger、JWT Bearer 驗證、ProblemDetails、分級 health checks、correlation id、security headers、rate limiting。
-- `Template.Worker`：可替換 dispatcher 的 Outbox 背景處理服務。
+- `Template.WebApi`：Minimal API endpoint、Swagger、JWT Bearer 驗證、ProblemDetails、分級 health checks、correlation id、security headers、rate limiting、OpenTelemetry。
+- `Template.Worker`：可替換 dispatcher 的 Outbox 背景處理服務與 OpenTelemetry outbox metrics。
 - `tests`：Domain、Application、API、Worker 與 Outbox 行為測試。
 
 ## 本機執行
@@ -136,6 +136,7 @@ docker compose --profile app up -d --build
 - [API 說明](docs/api.md)
 - [API Versioning](docs/api-versioning.md)
 - [設定說明](docs/configuration.md)
+- [Observability](docs/observability.md)
 - [Template Options](docs/template-options.md)
 - [範本維護指南](docs/template-authoring.md)
 - [維運指南](docs/operations.md)

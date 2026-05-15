@@ -15,6 +15,7 @@
 | [API 說明](api.md) | 目前 endpoint、驗證需求與 response pattern。 |
 | [API Versioning](api-versioning.md) | `/api/v1` route prefix、Swagger v1 grouping 與未來 v2 擴充方式。 |
 | [設定說明](configuration.md) | App settings、connection string、JWT、outbox 與環境設定。 |
+| [Observability](observability.md) | OpenTelemetry tracing、metrics、OTLP / Console exporter 與 outbox metrics。 |
 | [Template Options](template-options.md) | `--include-worker`、`--auth`、`--database`、`--sample-domain` 的產出差異矩陣。 |
 | [範本維護指南](template-authoring.md) | `dotnet new` template replacement 的運作方式。 |
 | [維運指南](operations.md) | 本機維運、health check、CI 與部署注意事項。 |
@@ -30,4 +31,5 @@
 5. Code review 時使用 [Clean Code 專案規範](clean-code-standards.md) 作為團隊共識。
 6. 修改行為前閱讀 [測試指南](testing.md)。
 7. 上線前逐項確認 [Production Checklist](production-checklist.md)。
-8. 遇到環境或 template 問題時看 [Troubleshooting](troubleshooting.md)。
+8. 上線監控前閱讀 [Observability](observability.md)。
+9. 遇到環境或 template 問題時看 [Troubleshooting](troubleshooting.md)。

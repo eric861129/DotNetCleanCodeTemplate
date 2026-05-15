@@ -27,6 +27,7 @@ services:
       Jwt__Issuer: CleanCodeTemplate
       Jwt__Audience: CleanCodeTemplate
       Jwt__SigningKey: local-development-signing-key-please-change
+      Observability__Enabled: "false"
     ports:
       - "8080:8080"
     depends_on:
@@ -45,6 +46,7 @@ services:
       Database__Provider: SqlServer
       Outbox__PollingIntervalSeconds: 5
       Outbox__BatchSize: 20
+      Observability__Enabled: "false"
     depends_on:
       sqlserver:
         condition: service_healthy

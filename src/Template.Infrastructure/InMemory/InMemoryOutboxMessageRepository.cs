@@ -23,4 +23,18 @@ public sealed class InMemoryOutboxMessageRepository : IOutboxMessageRepository
 
         return Task.FromResult(messages);
     }
+
+    public Task<long> CountPendingAsync(CancellationToken cancellationToken)
+    {
+        var count = _messages.LongCount(message => message.ProcessedAt is null);
+
+        return Task.FromResult(count);
+    }
+
+    public Task<long> CountFailedAsync(CancellationToken cancellationToken)
+    {
+        var count = _messages.LongCount(message => message.ProcessedAt is null && message.RetryCount > 0);
+
+        return Task.FromResult(count);
+    }
 }
