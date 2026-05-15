@@ -22,6 +22,8 @@ Template 設定位置：
 
 ## Template Options
 
+完整產出差異矩陣請看 [Template Options](template-options.md)；本節只保留維護 template 時需要知道的核心選項。
+
 | Option | 預設 | 說明 |
 | --- | --- | --- |
 | `--include-worker true|false` | `true` | 是否產生 Worker 專案、outbox dispatcher 與 Worker integration tests。 |

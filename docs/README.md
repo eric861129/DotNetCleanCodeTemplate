@@ -14,13 +14,19 @@
 | [測試指南](testing.md) | Unit test、integration test 與 template 驗證策略。 |
 | [API 說明](api.md) | 目前 endpoint、驗證需求與 response pattern。 |
 | [設定說明](configuration.md) | App settings、connection string、JWT、outbox 與環境設定。 |
+| [Template Options](template-options.md) | `--include-worker`、`--auth`、`--database`、`--sample-domain` 的產出差異矩陣。 |
 | [範本維護指南](template-authoring.md) | `dotnet new` template replacement 的運作方式。 |
 | [維運指南](operations.md) | 本機維運、health check、CI 與部署注意事項。 |
+| [Production Checklist](production-checklist.md) | 上線前檢查 JWT、secret、migration、Docker、outbox、observability 與 release gate。 |
+| [Troubleshooting](troubleshooting.md) | Docker SQL Server、JWT 401、template cache、EF migration 與 CI 常見問題。 |
 
 ## 建議閱讀順序
 
 1. 先閱讀 [快速開始](getting-started.md)。
 2. 新增功能前閱讀 [架構說明](architecture.md)。
 3. 實作新功能時照 [新增功能食譜](feature-cookbook.md)。
-4. Code review 時使用 [Clean Code 專案規範](clean-code-standards.md) 作為團隊共識。
-5. 修改行為前閱讀 [測試指南](testing.md)。
+4. 建立新專案前確認 [Template Options](template-options.md)。
+5. Code review 時使用 [Clean Code 專案規範](clean-code-standards.md) 作為團隊共識。
+6. 修改行為前閱讀 [測試指南](testing.md)。
+7. 上線前逐項確認 [Production Checklist](production-checklist.md)。
+8. 遇到環境或 template 問題時看 [Troubleshooting](troubleshooting.md)。

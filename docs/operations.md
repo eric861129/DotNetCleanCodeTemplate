@@ -93,6 +93,8 @@ curl -H "X-Correlation-Id: local-debug-001" http://localhost:5000/health/live -i
 
 ## 上線前檢查
 
+完整逐項清單請看 [Production Checklist](production-checklist.md)。快速確認項目如下：
+
 - 更換 development JWT signing key。
 - 使用 secret storage 管理 connection string 與 JWT 設定。
 - 建立並套用 EF Core migrations。

@@ -135,5 +135,8 @@ docker compose --profile app up -d --build
 - [測試指南](docs/testing.md)
 - [API 說明](docs/api.md)
 - [設定說明](docs/configuration.md)
+- [Template Options](docs/template-options.md)
 - [範本維護指南](docs/template-authoring.md)
 - [維運指南](docs/operations.md)
+- [Production Checklist](docs/production-checklist.md)
+- [Troubleshooting](docs/troubleshooting.md)
