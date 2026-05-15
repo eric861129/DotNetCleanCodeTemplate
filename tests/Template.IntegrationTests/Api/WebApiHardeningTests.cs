@@ -1,25 +1,11 @@
 using System.Net;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-//#if (useDatabase)
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-//#endif
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-//#if (useDatabase)
-using Template.Infrastructure.Persistence;
-//#endif
+using Template.IntegrationTests.Support;
 
 namespace Template.IntegrationTests.Api;
 
-public sealed class WebApiHardeningTests : IAsyncLifetime
+public sealed class WebApiHardeningTests : IDisposable
 {
-    //#if (useDatabase)
-    private readonly SqliteConnection _connection = new("Data Source=CleanCodeTemplateHardeningTests;Mode=Memory;Cache=Shared");
-    //#endif
-    private WebApplicationFactory<Program> _factory = null!;
+    private readonly TemplateWebApplicationFactory _factory = new();
 
     [Fact]
     public async Task ResponseIncludesGeneratedCorrelationId()
@@ -59,7 +45,7 @@ public sealed class WebApiHardeningTests : IAsyncLifetime
     [Fact]
     public async Task RateLimiterReturnsTooManyRequestsWhenLimitIsExceeded()
     {
-        await using var factory = CreateFactory(new Dictionary<string, string?>
+        using var factory = new TemplateWebApplicationFactory(new Dictionary<string, string?>
         {
             ["RateLimiting:PermitLimit"] = "1",
             ["RateLimiting:WindowSeconds"] = "60",
@@ -74,69 +60,8 @@ public sealed class WebApiHardeningTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.TooManyRequests, secondResponse.StatusCode);
     }
 
-    public async Task InitializeAsync()
+    public void Dispose()
     {
-        //#if (useDatabase)
-        await _connection.OpenAsync();
-        //#endif
-        _factory = CreateFactory(new Dictionary<string, string?>());
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _factory.DisposeAsync();
-        //#if (useDatabase)
-        await _connection.DisposeAsync();
-        //#endif
-    }
-
-    private WebApplicationFactory<Program> CreateFactory(IReadOnlyDictionary<string, string?> extraConfiguration)
-    {
-        return new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.UseEnvironment("Testing");
-                builder.ConfigureAppConfiguration((_, configurationBuilder) =>
-                {
-                    var configuration = new Dictionary<string, string?>
-                    {
-                        //#if (useDatabase)
-                        ["Database:Provider"] = "Sqlite",
-                        ["ConnectionStrings:DefaultConnection"] = _connection.ConnectionString
-                        //#endif
-                    };
-
-                    foreach (var item in extraConfiguration)
-                    {
-                        configuration[item.Key] = item.Value;
-                    }
-
-                    configurationBuilder.AddInMemoryCollection(configuration);
-                });
-
-                //#if (useDatabase)
-                builder.ConfigureTestServices(services =>
-                {
-                    var dbContextDescriptors = services
-                        .Where(descriptor =>
-                            descriptor.ServiceType == typeof(DbContextOptions)
-                            || descriptor.ServiceType == typeof(DbContextOptions<AppDbContext>)
-                            || descriptor.ServiceType.FullName?.Contains("IDbContextOptionsConfiguration", StringComparison.Ordinal) == true)
-                        .ToList();
-
-                    foreach (var descriptor in dbContextDescriptors)
-                    {
-                        services.Remove(descriptor);
-                    }
-
-                    services.AddDbContext<AppDbContext>(options => options.UseSqlite(_connection));
-
-                    using var provider = services.BuildServiceProvider();
-                    using var scope = provider.CreateScope();
-                    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    dbContext.Database.EnsureCreated();
-                });
-                //#endif
-            });
+        _factory.Dispose();
     }
 }

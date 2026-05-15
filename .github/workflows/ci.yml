@@ -27,3 +27,52 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
+
+  template-matrix:
+    runs-on: windows-latest
+    needs: build-test
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - scenario: default
+            project_name: SampleService
+            args: ""
+          - scenario: minimal
+            project_name: MinimalService
+            args: "--include-worker false --auth none --database none --sample-domain minimal"
+          - scenario: sqlite
+            project_name: SqliteService
+            args: "--database sqlite"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install template
+        run: dotnet new install . --force
+
+      - name: Generate template (${{ matrix.scenario }})
+        shell: pwsh
+        run: |
+          $output = Join-Path $env:RUNNER_TEMP "CleanCodeTemplate-${{ matrix.scenario }}"
+          dotnet new clean-code-api-worker -n ${{ matrix.project_name }} -o $output ${{ matrix.args }}
+          "TEMPLATE_OUTPUT=$output" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Restore generated solution
+        shell: pwsh
+        run: dotnet restore "$env:TEMPLATE_OUTPUT/${{ matrix.project_name }}.slnx"
+
+      - name: Build generated solution
+        shell: pwsh
+        run: dotnet build "$env:TEMPLATE_OUTPUT/${{ matrix.project_name }}.slnx" --no-restore
+
+      - name: Test generated solution
+        shell: pwsh
+        run: dotnet test "$env:TEMPLATE_OUTPUT/${{ matrix.project_name }}.slnx" --no-build --verbosity normal

@@ -10,6 +10,7 @@
 | [架構說明](architecture.md) | 分層責任、依賴方向與 request flow。 |
 | [快速開始](getting-started.md) | 安裝工具、執行範本、建立新服務。 |
 | [開發流程](development-workflow.md) | 如何新增功能，同時維持架構邊界。 |
+| [新增功能食譜](feature-cookbook.md) | 用 Customers 範例示範 Domain、Use Case、Validator、Repository、Endpoint 與測試如何落位。 |
 | [測試指南](testing.md) | Unit test、integration test 與 template 驗證策略。 |
 | [API 說明](api.md) | 目前 endpoint、驗證需求與 response pattern。 |
 | [設定說明](configuration.md) | App settings、connection string、JWT、outbox 與環境設定。 |
@@ -20,5 +21,6 @@
 
 1. 先閱讀 [快速開始](getting-started.md)。
 2. 新增功能前閱讀 [架構說明](architecture.md)。
-3. Code review 時使用 [Clean Code 專案規範](clean-code-standards.md) 作為團隊共識。
-4. 修改行為前閱讀 [測試指南](testing.md)。
+3. 實作新功能時照 [新增功能食譜](feature-cookbook.md)。
+4. Code review 時使用 [Clean Code 專案規範](clean-code-standards.md) 作為團隊共識。
+5. 修改行為前閱讀 [測試指南](testing.md)。

@@ -131,6 +131,7 @@ docker compose --profile app up -d --build
 - [架構說明](docs/architecture.md)
 - [快速開始](docs/getting-started.md)
 - [開發流程](docs/development-workflow.md)
+- [新增功能食譜](docs/feature-cookbook.md)
 - [測試指南](docs/testing.md)
 - [API 說明](docs/api.md)
 - [設定說明](docs/configuration.md)

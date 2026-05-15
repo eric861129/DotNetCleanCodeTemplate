@@ -8,33 +8,19 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 //#endif
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-//#if (useDatabase)
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-//#endif
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 //#if (useJwt)
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 //#endif
 using Template.Application.Common;
 using Template.Application.Orders;
-//#if (useDatabase)
-using Template.Infrastructure.Persistence;
-//#endif
+using Template.IntegrationTests.Support;
 
 namespace Template.IntegrationTests.Api;
 
-public sealed class OrdersApiTests : IAsyncLifetime
+public sealed class OrdersApiTests : IDisposable
 {
-    //#if (useDatabase)
-    private readonly SqliteConnection _connection = new("Data Source=CleanCodeTemplateTests;Mode=Memory;Cache=Shared");
-    //#endif
-    private WebApplicationFactory<Program> _factory = null!;
+    private readonly TemplateWebApplicationFactory _factory = new();
 
     [Fact]
     public async Task PostOrderCreatesOrder()
@@ -143,56 +129,9 @@ public sealed class OrdersApiTests : IAsyncLifetime
     }
     //#endif
 
-    public async Task InitializeAsync()
+    public void Dispose()
     {
-        //#if (useDatabase)
-        await _connection.OpenAsync();
-        //#endif
-        _factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.UseEnvironment("Testing");
-                //#if (useDatabase)
-                builder.ConfigureAppConfiguration((_, configurationBuilder) =>
-                {
-                    configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
-                    {
-                        ["Database:Provider"] = "Sqlite",
-                        ["ConnectionStrings:DefaultConnection"] = _connection.ConnectionString
-                    });
-                });
-
-                builder.ConfigureTestServices(services =>
-                {
-                    var dbContextDescriptors = services
-                        .Where(descriptor =>
-                            descriptor.ServiceType == typeof(DbContextOptions)
-                            || descriptor.ServiceType == typeof(DbContextOptions<AppDbContext>)
-                            || descriptor.ServiceType.FullName?.Contains("IDbContextOptionsConfiguration", StringComparison.Ordinal) == true)
-                        .ToList();
-
-                    foreach (var descriptor in dbContextDescriptors)
-                    {
-                        services.Remove(descriptor);
-                    }
-
-                    services.AddDbContext<AppDbContext>(options => options.UseSqlite(_connection));
-
-                    using var provider = services.BuildServiceProvider();
-                    using var scope = provider.CreateScope();
-                    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    dbContext.Database.EnsureCreated();
-                });
-                //#endif
-            });
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _factory.DisposeAsync();
-        //#if (useDatabase)
-        await _connection.DisposeAsync();
-        //#endif
+        _factory.Dispose();
     }
 
     //#if (useJwt)
