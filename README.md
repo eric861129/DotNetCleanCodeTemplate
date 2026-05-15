@@ -84,9 +84,9 @@ dotnet new uninstall .
 - `GET /health`
 - `GET /health/live`
 - `GET /health/ready`
-- `GET /api/orders?page=1&pageSize=20`
-- `POST /api/orders`
-- `GET /api/orders/{id}`
+- `GET /api/v1/orders?page=1&pageSize=20`
+- `POST /api/v1/orders`
+- `GET /api/v1/orders/{id}`
 
 訂單相關 endpoint 預設需要 JWT Bearer authentication。錯誤回應統一使用 `ProblemDetails` / `ValidationProblemDetails`。開發用 signing key 僅供本機使用，上線前必須更換。
 
@@ -134,6 +134,7 @@ docker compose --profile app up -d --build
 - [新增功能食譜](docs/feature-cookbook.md)
 - [測試指南](docs/testing.md)
 - [API 說明](docs/api.md)
+- [API Versioning](docs/api-versioning.md)
 - [設定說明](docs/configuration.md)
 - [Template Options](docs/template-options.md)
 - [範本維護指南](docs/template-authoring.md)

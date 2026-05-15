@@ -6,10 +6,14 @@ namespace Template.WebApi.Endpoints;
 
 public static class OrderEndpoints
 {
+    private const string ApiVersion = "v1";
+    private const string OrdersRoutePrefix = $"/api/{ApiVersion}/orders";
+
     public static IEndpointRouteBuilder MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/orders")
+        var group = app.MapGroup(OrdersRoutePrefix)
             .WithTags("Orders")
+            .WithGroupName(ApiVersion)
             .RequireRateLimiting("global");
 
         //#if (useJwt)
@@ -39,7 +43,7 @@ public static class OrderEndpoints
         {
             var result = await useCase.HandleAsync(request, cancellationToken);
 
-            return result.ToHttpResult(order => Results.Created($"/api/orders/{order.Id}", order));
+            return result.ToHttpResult(order => Results.Created($"{OrdersRoutePrefix}/{order.Id}", order));
         })
         .WithName("CreateOrder")
         .Produces<OrderResponse>(StatusCodes.Status201Created)

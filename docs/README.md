@@ -13,6 +13,7 @@
 | [新增功能食譜](feature-cookbook.md) | 用 Customers 範例示範 Domain、Use Case、Validator、Repository、Endpoint 與測試如何落位。 |
 | [測試指南](testing.md) | Unit test、integration test 與 template 驗證策略。 |
 | [API 說明](api.md) | 目前 endpoint、驗證需求與 response pattern。 |
+| [API Versioning](api-versioning.md) | `/api/v1` route prefix、Swagger v1 grouping 與未來 v2 擴充方式。 |
 | [設定說明](configuration.md) | App settings、connection string、JWT、outbox 與環境設定。 |
 | [Template Options](template-options.md) | `--include-worker`、`--auth`、`--database`、`--sample-domain` 的產出差異矩陣。 |
 | [範本維護指南](template-authoring.md) | `dotnet new` template replacement 的運作方式。 |

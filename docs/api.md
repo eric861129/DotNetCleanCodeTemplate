@@ -9,9 +9,9 @@
 | `GET` | `/health` | Anonymous | 相容入口，等同 ready check。 |
 | `GET` | `/health/live` | Anonymous | Liveness probe，只確認 process alive。 |
 | `GET` | `/health/ready` | Anonymous | Readiness probe，檢查資料庫可用性。 |
-| `GET` | `/api/orders?page=1&pageSize=20` | JWT Bearer | 分頁查詢訂單。 |
-| `POST` | `/api/orders` | JWT Bearer | 建立訂單。 |
-| `GET` | `/api/orders/{id}` | JWT Bearer | 依 id 取得單筆訂單。 |
+| `GET` | `/api/v1/orders?page=1&pageSize=20` | JWT Bearer | 分頁查詢訂單。 |
+| `POST` | `/api/v1/orders` | JWT Bearer | 建立訂單。 |
+| `GET` | `/api/v1/orders/{id}` | JWT Bearer | 依 id 取得單筆訂單。 |
 
 若產生範本時使用 `--auth none`，Orders endpoint 不會套用 JWT middleware。
 
@@ -33,7 +33,7 @@
 Request：
 
 ```text
-GET /api/orders?page=1&pageSize=20
+GET /api/v1/orders?page=1&pageSize=20
 ```
 
 成功回應：`200 OK`
@@ -107,4 +107,10 @@ Development 環境會啟用 Swagger：
 
 ```text
 /swagger
+```
+
+目前範本使用簡單 route prefix 示範 API versioning，Swagger document 會以 `v1` 分組：
+
+```text
+/swagger/v1/swagger.json
 ```

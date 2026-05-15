@@ -42,8 +42,8 @@ Server=localhost,11433;Database=CleanCodeTemplate;User Id=sa;Password=Your_stron
 
 常見症狀：
 
-- `POST /api/orders` 回傳 `401 Unauthorized`。
-- `GET /api/orders/{id}` 回傳 `401 Unauthorized`。
+- `POST /api/v1/orders` 回傳 `401 Unauthorized`。
+- `GET /api/v1/orders/{id}` 回傳 `401 Unauthorized`。
 - Swagger 可以開，但呼叫 Orders endpoint 失敗。
 
 原因：

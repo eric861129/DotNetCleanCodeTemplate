@@ -40,7 +40,7 @@ Infrastructure ┘
 
 ## Request Flow
 
-`POST /api/orders` 流程：
+`POST /api/v1/orders` 流程：
 
 ```text
 HTTP request

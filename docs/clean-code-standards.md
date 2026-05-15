@@ -152,7 +152,7 @@ group.MapPost("/", async (
 {
     var result = await useCase.HandleAsync(request, cancellationToken);
     return result.IsSuccess
-        ? Results.Created($"/api/orders/{result.Value.Id}", result.Value)
+        ? Results.Created($"/api/v1/orders/{result.Value.Id}", result.Value)
         : Results.BadRequest(new { message = result.Error });
 });
 ```

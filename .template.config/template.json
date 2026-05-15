@@ -150,7 +150,8 @@
             "src/Template.Application/Orders/**",
             "src/Template.WebApi/Endpoints/OrderEndpoints.cs",
             "tests/Template.UnitTests/Orders/**",
-            "tests/Template.IntegrationTests/Api/OrdersApiTests.cs"
+            "tests/Template.IntegrationTests/Api/OrdersApiTests.cs",
+            "tests/Template.IntegrationTests/Api/ProblemDetailsTests.cs"
           ]
         }
       ]

@@ -5,7 +5,7 @@ Accept: application/json
 
 ###
 
-POST {{Template.WebApi_HostAddress}}/api/orders
+POST {{Template.WebApi_HostAddress}}/api/v1/orders
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 

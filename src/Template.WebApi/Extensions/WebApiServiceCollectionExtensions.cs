@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
 //#if (useJwt)
 using Microsoft.IdentityModel.Tokens;
 //#endif
@@ -26,7 +27,15 @@ public static class WebApiServiceCollectionExtensions
         services.AddInfrastructure(configuration);
         services.AddWebApiHealthChecks();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Template API",
+                Version = "v1",
+                Description = "Versioned Clean Architecture API sample."
+            });
+        });
         services.AddProblemDetails();
         services.AddWebApiRateLimiting(configuration);
         //#if (useJwt)

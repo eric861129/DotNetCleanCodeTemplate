@@ -33,7 +33,7 @@ public sealed class OrdersApiTests : IDisposable
             "customer-001",
             [new CreateOrderItemRequest("Clean Code", 2, 30m)]);
 
-        var response = await client.PostAsJsonAsync("/api/orders", request);
+        var response = await client.PostAsJsonAsync("/api/v1/orders", request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var created = await response.Content.ReadFromJsonAsync<OrderResponse>();
@@ -52,10 +52,10 @@ public sealed class OrdersApiTests : IDisposable
             "customer-001",
             [new CreateOrderItemRequest("Clean Code", 1, 30m)]);
 
-        var createResponse = await client.PostAsJsonAsync("/api/orders", request);
+        var createResponse = await client.PostAsJsonAsync("/api/v1/orders", request);
         var created = await createResponse.Content.ReadFromJsonAsync<OrderResponse>();
 
-        var response = await client.GetAsync($"/api/orders/{created!.Id}");
+        var response = await client.GetAsync($"/api/v1/orders/{created!.Id}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var order = await response.Content.ReadFromJsonAsync<OrderResponse>();
@@ -71,13 +71,13 @@ public sealed class OrdersApiTests : IDisposable
         //#endif
 
         await client.PostAsJsonAsync(
-            "/api/orders",
+            "/api/v1/orders",
             new CreateOrderRequest("customer-001", [new CreateOrderItemRequest("Clean Code", 1, 30m)]));
         await client.PostAsJsonAsync(
-            "/api/orders",
+            "/api/v1/orders",
             new CreateOrderRequest("customer-002", [new CreateOrderItemRequest("Refactoring", 1, 45m)]));
 
-        var response = await client.GetAsync("/api/orders?page=1&pageSize=1");
+        var response = await client.GetAsync("/api/v1/orders?page=1&pageSize=1");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var page = await response.Content.ReadFromJsonAsync<PagedResult<OrderResponse>>();
@@ -95,7 +95,7 @@ public sealed class OrdersApiTests : IDisposable
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
         //#endif
 
-        var response = await client.PostAsJsonAsync("/api/orders", new CreateOrderRequest("", []));
+        var response = await client.PostAsJsonAsync("/api/v1/orders", new CreateOrderRequest("", []));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -109,7 +109,7 @@ public sealed class OrdersApiTests : IDisposable
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
         //#endif
 
-        var response = await client.GetAsync($"/api/orders/{Guid.NewGuid()}");
+        var response = await client.GetAsync($"/api/v1/orders/{Guid.NewGuid()}");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -122,7 +122,7 @@ public sealed class OrdersApiTests : IDisposable
         var client = _factory.CreateClient();
 
         var response = await client.PostAsJsonAsync(
-            "/api/orders",
+            "/api/v1/orders",
             new CreateOrderRequest("customer-001", [new CreateOrderItemRequest("Clean Code", 1, 30m)]));
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);

@@ -15,14 +15,21 @@ namespace Template.IntegrationTests.Support;
 
 public sealed class TemplateWebApplicationFactory : WebApplicationFactory<Program>
 {
+    private readonly string _environment;
     private readonly IReadOnlyDictionary<string, string?> _extraConfiguration;
+    private readonly Action<IServiceCollection>? _configureTestServices;
     //#if (useDatabase)
     private readonly SqliteConnection _connection;
     //#endif
 
-    public TemplateWebApplicationFactory(IReadOnlyDictionary<string, string?>? extraConfiguration = null)
+    public TemplateWebApplicationFactory(
+        IReadOnlyDictionary<string, string?>? extraConfiguration = null,
+        string environment = "Testing",
+        Action<IServiceCollection>? configureTestServices = null)
     {
+        _environment = environment;
         _extraConfiguration = extraConfiguration ?? new Dictionary<string, string?>();
+        _configureTestServices = configureTestServices;
         //#if (useDatabase)
         _connection = new SqliteConnection($"Data Source=CleanCodeTemplateTests-{Guid.NewGuid():N};Mode=Memory;Cache=Shared");
         _connection.Open();
@@ -31,7 +38,7 @@ public sealed class TemplateWebApplicationFactory : WebApplicationFactory<Progra
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment(_environment);
         builder.ConfigureAppConfiguration((_, configurationBuilder) =>
         {
             var configuration = new Dictionary<string, string?>
@@ -73,6 +80,11 @@ public sealed class TemplateWebApplicationFactory : WebApplicationFactory<Progra
             dbContext.Database.EnsureCreated();
         });
         //#endif
+
+        if (_configureTestServices is not null)
+        {
+            builder.ConfigureTestServices(_configureTestServices);
+        }
     }
 
     protected override void Dispose(bool disposing)

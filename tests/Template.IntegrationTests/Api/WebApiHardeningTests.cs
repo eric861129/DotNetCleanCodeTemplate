@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Template.IntegrationTests.Support;
 
 namespace Template.IntegrationTests.Api;
@@ -58,6 +59,23 @@ public sealed class WebApiHardeningTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
         Assert.Equal(HttpStatusCode.TooManyRequests, secondResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task SwaggerV1DocumentIsAvailableInDevelopment()
+    {
+        using var factory = new TemplateWebApplicationFactory(environment: "Development");
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/swagger/v1/swagger.json");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var swaggerJson = await response.Content.ReadAsStringAsync();
+        using var swaggerDocument = JsonDocument.Parse(swaggerJson);
+        Assert.Equal("v1", swaggerDocument.RootElement.GetProperty("info").GetProperty("version").GetString());
+        //#if (includeOrders)
+        Assert.Contains("/api/v1/orders", swaggerJson, StringComparison.OrdinalIgnoreCase);
+        //#endif
     }
 
     public void Dispose()

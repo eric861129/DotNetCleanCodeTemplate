@@ -304,8 +304,9 @@ public static class CustomerEndpoints
 {
     public static IEndpointRouteBuilder MapCustomerEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/customers")
+        var group = app.MapGroup("/api/v1/customers")
             .WithTags("Customers")
+            .WithGroupName("v1")
             .RequireRateLimiting("global");
 
         group.RequireAuthorization();
@@ -317,7 +318,7 @@ public static class CustomerEndpoints
         {
             var result = await useCase.HandleAsync(request, cancellationToken);
 
-            return result.ToHttpResult(customer => Results.Created($"/api/customers/{customer.Id}", customer));
+            return result.ToHttpResult(customer => Results.Created($"/api/v1/customers/{customer.Id}", customer));
         })
         .WithName("RegisterCustomer")
         .Produces<CustomerResponse>(StatusCodes.Status201Created)
@@ -420,7 +421,7 @@ public sealed class CustomersApiTests : IDisposable
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
 
         var response = await client.PostAsJsonAsync(
-            "/api/customers",
+            "/api/v1/customers",
             new RegisterCustomerRequest("Alice", "alice@example.com"));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
