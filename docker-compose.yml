@@ -12,3 +12,39 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  webapi:
+    build:
+      context: .
+      dockerfile: src/Template.WebApi/Dockerfile
+    container_name: clean-code-template-webapi
+    profiles: ["app"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=CleanCodeTemplate;User Id=sa;Password=Your_strong_password123;TrustServerCertificate=True
+      Database__Provider: SqlServer
+      Jwt__Issuer: CleanCodeTemplate
+      Jwt__Audience: CleanCodeTemplate
+      Jwt__SigningKey: local-development-signing-key-please-change
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: src/Template.Worker/Dockerfile
+    container_name: clean-code-template-worker
+    profiles: ["app"]
+    environment:
+      DOTNET_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=CleanCodeTemplate;User Id=sa;Password=Your_strong_password123;TrustServerCertificate=True
+      Database__Provider: SqlServer
+      Outbox__PollingIntervalSeconds: 5
+      Outbox__BatchSize: 20
+    depends_on:
+      sqlserver:
+        condition: service_healthy

@@ -28,6 +28,9 @@
 
 - `SqlServer`：本機開發與接近 production 的預設選項。
 - `Sqlite`：integration test 使用。
+- `none`：只在 `dotnet new --database none` 產生的骨架中使用，不註冊 EF Core persistence。
+
+`Database:Provider` 會在啟動時驗證；目前完整範本允許 `SqlServer` 與 `Sqlite`。
 
 ## JWT
 
@@ -44,7 +47,7 @@
 Production 建議：
 
 - 將 `SigningKey` 放在 secret storage。
-- 使用足夠強度與長度的 key。
+- 使用足夠強度與長度的 key；範本啟動時要求至少 32 個字元。
 - 每個服務維持穩定的 issuer 與 audience。
 
 ## Outbox
@@ -61,7 +64,9 @@ Production 建議：
 | 設定 | 用途 |
 | --- | --- |
 | `PollingIntervalSeconds` | Worker 每次 polling 之間的延遲秒數。 |
-| `BatchSize` | 每輪最多處理的 pending outbox messages 數量。 |
+| `BatchSize` | 每輪最多處理的 pending outbox messages 數量，允許範圍為 `1` 到 `100`。 |
+
+`Outbox` options 會在 Worker 啟動時驗證，避免部署後才發現 polling 設定無效。
 
 ## Environment Variables
 

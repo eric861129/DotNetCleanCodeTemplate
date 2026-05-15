@@ -9,8 +9,11 @@ public static class OrderEndpoints
     public static IEndpointRouteBuilder MapOrderEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/orders")
-            .WithTags("Orders")
-            .RequireAuthorization();
+            .WithTags("Orders");
+
+        //#if (useJwt)
+        group.RequireAuthorization();
+        //#endif
 
         group.MapGet("/", async (
             int page,
@@ -24,7 +27,9 @@ public static class OrderEndpoints
         })
         .WithName("GetOrders")
         .Produces<PagedResult<OrderResponse>>()
+        //#if (useJwt)
         .ProducesProblem(StatusCodes.Status401Unauthorized);
+        //#endif
 
         group.MapPost("/", async (
             CreateOrderRequest request,
@@ -38,7 +43,9 @@ public static class OrderEndpoints
         .WithName("CreateOrder")
         .Produces<OrderResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
+        //#if (useJwt)
         .ProducesProblem(StatusCodes.Status401Unauthorized);
+        //#endif
 
         group.MapGet("/{id:guid}", async (
             Guid id,
@@ -52,7 +59,9 @@ public static class OrderEndpoints
         .WithName("GetOrderById")
         .Produces<OrderResponse>()
         .ProducesProblem(StatusCodes.Status404NotFound)
+        //#if (useJwt)
         .ProducesProblem(StatusCodes.Status401Unauthorized);
+        //#endif
 
         return app;
     }

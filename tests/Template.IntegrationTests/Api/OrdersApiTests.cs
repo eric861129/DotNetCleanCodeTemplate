@@ -1,34 +1,48 @@
 using System.Net;
+//#if (useJwt)
 using System.Net.Http.Headers;
+//#endif
 using System.Net.Http.Json;
+//#if (useJwt)
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+//#endif
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+//#if (useDatabase)
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+//#endif
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+//#if (useJwt)
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Template.Application.Orders;
+//#endif
 using Template.Application.Common;
+using Template.Application.Orders;
+//#if (useDatabase)
 using Template.Infrastructure.Persistence;
+//#endif
 
 namespace Template.IntegrationTests.Api;
 
 public sealed class OrdersApiTests : IAsyncLifetime
 {
+    //#if (useDatabase)
     private readonly SqliteConnection _connection = new("Data Source=CleanCodeTemplateTests;Mode=Memory;Cache=Shared");
+    //#endif
     private WebApplicationFactory<Program> _factory = null!;
 
     [Fact]
     public async Task PostOrderCreatesOrder()
     {
         var client = _factory.CreateClient();
+        //#if (useJwt)
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
+        //#endif
         var request = new CreateOrderRequest(
             "customer-001",
             [new CreateOrderItemRequest("Clean Code", 2, 30m)]);
@@ -45,7 +59,9 @@ public sealed class OrdersApiTests : IAsyncLifetime
     public async Task GetOrderReturnsCreatedOrder()
     {
         var client = _factory.CreateClient();
+        //#if (useJwt)
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
+        //#endif
         var request = new CreateOrderRequest(
             "customer-001",
             [new CreateOrderItemRequest("Clean Code", 1, 30m)]);
@@ -64,7 +80,9 @@ public sealed class OrdersApiTests : IAsyncLifetime
     public async Task GetOrdersReturnsPagedOrders()
     {
         var client = _factory.CreateClient();
+        //#if (useJwt)
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
+        //#endif
 
         await client.PostAsJsonAsync(
             "/api/orders",
@@ -87,7 +105,9 @@ public sealed class OrdersApiTests : IAsyncLifetime
     public async Task PostOrderValidationFailureReturnsValidationProblem()
     {
         var client = _factory.CreateClient();
+        //#if (useJwt)
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
+        //#endif
 
         var response = await client.PostAsJsonAsync("/api/orders", new CreateOrderRequest("", []));
 
@@ -99,7 +119,9 @@ public sealed class OrdersApiTests : IAsyncLifetime
     public async Task GetMissingOrderReturnsProblemDetails()
     {
         var client = _factory.CreateClient();
+        //#if (useJwt)
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken());
+        //#endif
 
         var response = await client.GetAsync($"/api/orders/{Guid.NewGuid()}");
 
@@ -107,6 +129,7 @@ public sealed class OrdersApiTests : IAsyncLifetime
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
     }
 
+    //#if (useJwt)
     [Fact]
     public async Task PostOrderRequiresAuthentication()
     {
@@ -118,14 +141,18 @@ public sealed class OrdersApiTests : IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
+    //#endif
 
     public async Task InitializeAsync()
     {
+        //#if (useDatabase)
         await _connection.OpenAsync();
+        //#endif
         _factory = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
                 builder.UseEnvironment("Testing");
+                //#if (useDatabase)
                 builder.ConfigureAppConfiguration((_, configurationBuilder) =>
                 {
                     configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
@@ -156,15 +183,19 @@ public sealed class OrdersApiTests : IAsyncLifetime
                     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     dbContext.Database.EnsureCreated();
                 });
+                //#endif
             });
     }
 
     public async Task DisposeAsync()
     {
         await _factory.DisposeAsync();
+        //#if (useDatabase)
         await _connection.DisposeAsync();
+        //#endif
     }
 
+    //#if (useJwt)
     private static string CreateToken()
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("local-development-signing-key-please-change"));
@@ -180,4 +211,5 @@ public sealed class OrdersApiTests : IAsyncLifetime
 
         return new JsonWebTokenHandler().CreateToken(descriptor);
     }
+    //#endif
 }

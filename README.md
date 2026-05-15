@@ -7,7 +7,7 @@
 - `Template.Domain`：訂單聚合、業務規則、domain exception。
 - `Template.Application`：use case contract、request/response record、repository 介面、unit of work、outbox contract。
 - `Template.Infrastructure`：EF Core persistence、SQL Server 預設設定、repository 實作、outbox 儲存、migration-ready DbContext。
-- `Template.WebApi`：Minimal API endpoint、Swagger、JWT Bearer 驗證、health check、problem details。
+- `Template.WebApi`：Minimal API endpoint、Swagger、JWT Bearer 驗證、ProblemDetails、分級 health checks。
 - `Template.Worker`：可替換 dispatcher 的 Outbox 背景處理服務。
 - `tests`：Domain、Application、API、Worker 與 Outbox 行為測試。
 
@@ -53,6 +53,26 @@ dotnet new install .
 dotnet new clean-code-api-worker -n SampleService
 ```
 
+常用選項：
+
+```powershell
+dotnet new clean-code-api-worker -n SampleService `
+  --include-worker true `
+  --auth jwt `
+  --database sqlserver `
+  --sample-domain orders
+```
+
+極簡骨架：
+
+```powershell
+dotnet new clean-code-api-worker -n MinimalService `
+  --include-worker false `
+  --auth none `
+  --database none `
+  --sample-domain minimal
+```
+
 需要移除本機範本時：
 
 ```powershell
@@ -62,10 +82,13 @@ dotnet new uninstall .
 ## API
 
 - `GET /health`
+- `GET /health/live`
+- `GET /health/ready`
+- `GET /api/orders?page=1&pageSize=20`
 - `POST /api/orders`
 - `GET /api/orders/{id}`
 
-訂單相關 endpoint 需要 JWT Bearer authentication。開發用 signing key 僅供本機使用，上線前必須更換。
+訂單相關 endpoint 預設需要 JWT Bearer authentication。錯誤回應統一使用 `ProblemDetails` / `ValidationProblemDetails`。開發用 signing key 僅供本機使用，上線前必須更換。
 
 ## 資料庫
 
@@ -83,6 +106,20 @@ dotnet new uninstall .
 
 ```powershell
 dotnet ef migrations add InitialCreate --project src/Template.Infrastructure --startup-project src/Template.WebApi
+```
+
+## Docker
+
+只啟動 SQL Server：
+
+```powershell
+docker compose up -d sqlserver
+```
+
+啟動 SQL Server、API 與 Worker：
+
+```powershell
+docker compose --profile app up -d --build
 ```
 
 ## 文件

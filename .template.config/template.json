@@ -24,6 +24,84 @@
       ],
       "defaultValue": "net10.0",
       "replaces": "net10.0"
+    },
+    "includeWorker": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Include the background Worker project and outbox dispatcher."
+    },
+    "auth": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "jwt",
+      "description": "Authentication mode for generated API endpoints.",
+      "choices": [
+        {
+          "choice": "jwt",
+          "description": "Use JWT Bearer authentication."
+        },
+        {
+          "choice": "none",
+          "description": "Generate API without authentication middleware."
+        }
+      ]
+    },
+    "database": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "sqlserver",
+      "description": "Persistence provider for the generated template.",
+      "choices": [
+        {
+          "choice": "sqlserver",
+          "description": "Use EF Core with SQL Server."
+        },
+        {
+          "choice": "sqlite",
+          "description": "Use EF Core with SQLite."
+        },
+        {
+          "choice": "none",
+          "description": "Generate without EF Core persistence."
+        }
+      ]
+    },
+    "sampleDomain": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "orders",
+      "description": "Sample domain included in generated code.",
+      "choices": [
+        {
+          "choice": "orders",
+          "description": "Include Orders domain, endpoints, use cases, and tests."
+        },
+        {
+          "choice": "minimal",
+          "description": "Generate a minimal clean architecture skeleton without the Orders sample."
+        }
+      ]
+    },
+    "useJwt": {
+      "type": "computed",
+      "value": "(auth == \"jwt\")"
+    },
+    "useDatabase": {
+      "type": "computed",
+      "value": "(!(database == \"none\"))"
+    },
+    "useSqlServer": {
+      "type": "computed",
+      "value": "(database == \"sqlserver\")"
+    },
+    "useSqlite": {
+      "type": "computed",
+      "value": "(database == \"sqlite\")"
+    },
+    "includeOrders": {
+      "type": "computed",
+      "value": "(sampleDomain == \"orders\")"
     }
   },
   "sources": [
@@ -35,7 +113,81 @@
         "**/bin/**",
         "**/obj/**",
         ".template-output/**"
+      ],
+      "modifiers": [
+        {
+          "condition": "(!includeWorker)",
+          "exclude": [
+            "src/Template.Worker/**",
+            "tests/Template.IntegrationTests/Worker/**"
+          ]
+        },
+        {
+          "condition": "(!useJwt)",
+          "exclude": [
+            "src/Template.WebApi/Options/JwtOptions.cs"
+          ]
+        },
+        {
+          "condition": "(!useDatabase)",
+          "exclude": [
+            "src/Template.Infrastructure/Persistence/**",
+            "src/Template.Infrastructure/Options/DatabaseOptions.cs",
+            "src/Template.WebApi/Health/DatabaseHealthCheck.cs",
+            "tests/Template.IntegrationTests/Worker/**"
+          ]
+        },
+        {
+          "condition": "(!includeOrders)",
+          "exclude": [
+            "src/Template.Infrastructure/InMemory/**"
+          ]
+        },
+        {
+          "condition": "(!includeOrders)",
+          "exclude": [
+            "src/Template.Domain/Orders/**",
+            "src/Template.Application/Orders/**",
+            "src/Template.WebApi/Endpoints/OrderEndpoints.cs",
+            "tests/Template.UnitTests/Orders/**",
+            "tests/Template.IntegrationTests/Api/OrdersApiTests.cs"
+          ]
+        }
       ]
     }
-  ]
+  ],
+  "SpecialCustomOperations": {
+    "**/*.csproj": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": ["<!--#if"],
+            "else": ["<!--#else"],
+            "elseif": ["<!--#elseif"],
+            "endif": ["<!--#endif"],
+            "trim": true,
+            "wholeLine": true,
+            "evaluator": "C++"
+          }
+        }
+      ]
+    },
+    "**/*.slnx": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": ["<!--#if"],
+            "else": ["<!--#else"],
+            "elseif": ["<!--#elseif"],
+            "endif": ["<!--#endif"],
+            "trim": true,
+            "wholeLine": true,
+            "evaluator": "C++"
+          }
+        }
+      ]
+    }
+  }
 }
